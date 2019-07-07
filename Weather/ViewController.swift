@@ -2,19 +2,57 @@ import UIKit
 import MapKit
 import CoreLocation
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
 
+struct WeatherInfo: Codable {
+    let id: Int
+    let weatherStateName: String
+    let weatherStateAbbr: String
+    let windDirectionCompass: String
+    let created: Date
+    let applicableDate: Date
+    let minTemp: Double?
+    let maxTemp: Double?
+    let theTemp: Double?
+    let windSpeed: Double
+    let windDirection: Double
+    let airPressure: Double?
+    let humidity: Int?
+    let visibility: Double?
+    let predictability: Int
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case weatherStateName = "weather_state_name"
+        case weatherStateAbbr = "weather_state_abbr"
+        case windDirectionCompass = "wind_direction_compass"
+        case created
+        case applicableDate = "applicable_date"
+        case minTemp = "min_temp"
+        case maxTemp = "max_temp"
+        case theTemp = "the_temp"
+        case windSpeed = "wind_speed"
+        case windDirection = "wind_direction"
+        case airPressure = "air_pressure"
+        case humidity
+        case visibility
+        case predictability
+    }
+}
+
+class ViewController: UIViewController, CLLocationManagerDelegate {
+    
     @IBOutlet weak var daysTableView: UITableView!
     @IBOutlet weak var hoursCollectionView: UICollectionView!
     @IBOutlet weak var currentCity: UILabel!
     
     let arrayOfDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sut", "Sun", "Tue", "Wed", "Thu", "Fri", "Sut", "Sun"]
+    var weatherInfoArray = [WeatherInfo]()
     var locationManager = CLLocationManager()
-    var urlString = "https://www.metaweather.com/api/"
+    var urlString = "https://www.metaweather.com/api/location/44418/2013/4/27/"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         updateLocation()
+        downloadData()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -42,7 +80,35 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                        error)
         }
     }
-
+    
+    func downloadData() {
+        guard let url = URL(string: urlString) else { return}
+        let dataTask = URLSession.shared.dataTask(with: url) {
+            (data, responce, error) in guard let dataResponce = data else { return }
+            self.parseData(data: dataResponce)
+        }
+        dataTask.resume()
+    }
+    
+    func parseData(data: Data) {
+        do {
+            let weatherData = try JSONSerialization.jsonObject(with: data, options: [])
+            print(weatherData)
+            
+            guard let jsonArray = weatherData as? [[String: Any]] else { return }
+            print("A")
+            let joined = Array(jsonArray.joined())
+          print(joined)
+            print("S")
+            guard let weatherStateName = jsonArray[0]["weatherStateName"] as? String else { return }
+            print(weatherStateName)
+            
+        } catch let error {
+            print("there is an error: \(error)")
+        }
+        
+        
+    }
     
 }
 
