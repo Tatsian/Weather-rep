@@ -112,7 +112,56 @@
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XkP-yg-ZWA" userLabel="View of weather per hours">
                                 <rect key="frame" x="2" y="236" width="316" height="63"/>
+                                <subviews>
+                                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="B3f-Yj-lVH">
+                                        <rect key="frame" x="0.0" y="0.0" width="316" height="63"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="3q9-Pz-dMn">
+                                            <size key="itemSize" width="50" height="50"/>
+                                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                        </collectionViewFlowLayout>
+                                        <cells>
+                                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="collectionIdentifier" id="oEL-ON-cs4" customClass="HoursCollectionViewCell" customModule="Weather" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="6.5" width="50" height="50"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LtR-0g-rAu">
+                                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                    </subviews>
+                                                </view>
+                                                <constraints>
+                                                    <constraint firstItem="LtR-0g-rAu" firstAttribute="top" secondItem="oEL-ON-cs4" secondAttribute="top" id="Apt-76-Qcc"/>
+                                                    <constraint firstAttribute="trailing" secondItem="LtR-0g-rAu" secondAttribute="trailing" id="CXR-gV-bqE"/>
+                                                    <constraint firstAttribute="bottom" secondItem="LtR-0g-rAu" secondAttribute="bottom" id="RDA-W6-LxK"/>
+                                                    <constraint firstItem="LtR-0g-rAu" firstAttribute="leading" secondItem="oEL-ON-cs4" secondAttribute="leading" id="iYp-1U-hNg"/>
+                                                </constraints>
+                                                <connections>
+                                                    <outlet property="hoursCell" destination="LtR-0g-rAu" id="BoK-vO-diH"/>
+                                                </connections>
+                                            </collectionViewCell>
+                                        </cells>
+                                        <connections>
+                                            <outlet property="dataSource" destination="BYZ-38-t0r" id="Uho-uR-6PZ"/>
+                                            <outlet property="delegate" destination="BYZ-38-t0r" id="5d6-aq-cja"/>
+                                        </connections>
+                                    </collectionView>
+                                </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="B3f-Yj-lVH" firstAttribute="top" secondItem="XkP-yg-ZWA" secondAttribute="top" id="Hop-Rt-Zvd"/>
+                                    <constraint firstItem="B3f-Yj-lVH" firstAttribute="leading" secondItem="XkP-yg-ZWA" secondAttribute="leading" id="MXE-D1-CMN"/>
+                                    <constraint firstAttribute="bottom" secondItem="B3f-Yj-lVH" secondAttribute="bottom" id="hM9-No-MUY"/>
+                                    <constraint firstAttribute="trailing" secondItem="B3f-Yj-lVH" secondAttribute="trailing" id="xUo-LS-akq"/>
+                                </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Hyb-6j-u0Q" userLabel="View of other days">
                                 <rect key="frame" x="2" y="301" width="316" height="189"/>
@@ -230,7 +279,9 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="currentCity" destination="vKR-x5-gLm" id="FoV-bO-Xn7"/>
                         <outlet property="daysTableView" destination="rZD-iC-2IJ" id="GCz-4R-TGA"/>
+                        <outlet property="hoursCollectionView" destination="B3f-Yj-lVH" id="D9s-Ty-3DD"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
