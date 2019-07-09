@@ -2,53 +2,17 @@ import UIKit
 import MapKit
 import CoreLocation
 
-
-struct WeatherInfo: Codable {
-    let id: Int
-    let weatherStateName: String
-    let weatherStateAbbr: String
-    let windDirectionCompass: String
-    let created: Date
-    let applicableDate: Date
-    let minTemp: Double?
-    let maxTemp: Double?
-    let theTemp: Double?
-    let windSpeed: Double
-    let windDirection: Double
-    let airPressure: Double?
-    let humidity: Int?
-    let visibility: Double?
-    let predictability: Int
-    private enum CodingKeys: String, CodingKey {
-        case id
-        case weatherStateName = "weather_state_name"
-        case weatherStateAbbr = "weather_state_abbr"
-        case windDirectionCompass = "wind_direction_compass"
-        case created
-        case applicableDate = "applicable_date"
-        case minTemp = "min_temp"
-        case maxTemp = "max_temp"
-        case theTemp = "the_temp"
-        case windSpeed = "wind_speed"
-        case windDirection = "wind_direction"
-        case airPressure = "air_pressure"
-        case humidity
-        case visibility
-        case predictability
-    }
-}
-
 class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var daysTableView: UITableView!
     @IBOutlet weak var hoursCollectionView: UICollectionView!
     @IBOutlet weak var currentCity: UILabel!
     
-    let arrayOfDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sut", "Sun", "Tue", "Wed", "Thu", "Fri", "Sut", "Sun"]
-    var weatherInfoArray = [WeatherInfo]()
+    let arrayOfDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sut", "Sun"]
+
     var locationManager = CLLocationManager()
-    var urlString = "https://www.metaweather.com/api/location/44418/2013/4/27/"
-    
+    var urlString = "https://www.metaweather.com/api/location/44418/"
+
     override func viewDidLoad() {
         super.viewDidLoad()
         updateLocation()
@@ -56,6 +20,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let locValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
+        print("locations = \(locValue.latitude) \(locValue.longitude)")
+        
         guard let location: CLLocation = manager.location else { return }
         fetchCityAndCountry(from: location) { city, country, error in
             guard let city = city, let country = country, error == nil else { return }
@@ -71,6 +38,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
             locationManager.startUpdatingLocation() // слежение за местом положения
         }
+    }
+    
+    func findWoeidLocatin() {
+        
     }
     
     func fetchCityAndCountry(from location: CLLocation, completion: @escaping (_ city: String?, _ country:  String?, _ error: Error?) -> ()) {
@@ -92,16 +63,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func parseData(data: Data) {
         do {
-            let weatherData = try JSONSerialization.jsonObject(with: data, options: [])
-            print(weatherData)
-            
-            guard let jsonArray = weatherData as? [[String: Any]] else { return }
-            print("A")
-            let joined = Array(jsonArray.joined())
-          print(joined)
-            print("S")
-            guard let weatherStateName = jsonArray[0]["weatherStateName"] as? String else { return }
-            print(weatherStateName)
+            let weatherInfo = try JSONDecoder().decode(WeatherModel.self, from: data)
+            print(weatherInfo)
+            let todayMax = weatherInfo.consolidatedWeather[0].maxTemp
+            let dateOfADay = weatherInfo.consolidatedWeather[0].applicableDate
+            print(dateOfADay)
+            print(todayMax)
             
         } catch let error {
             print("there is an error: \(error)")

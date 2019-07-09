@@ -15,6 +15,7 @@
 		5B0A91D322CF39720066E0B0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B0A91D122CF39720066E0B0 /* LaunchScreen.storyboard */; };
 		5B0A91DB22CF9DCA0066E0B0 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0A91DA22CF9DCA0066E0B0 /* CustomTableViewCell.swift */; };
 		5B0ABF7A22D12D8D00183437 /* HoursCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0ABF7922D12D8D00183437 /* HoursCollectionViewCell.swift */; };
+		5B0ABF7E22D4BB8800183437 /* WeatherModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0ABF7D22D4BB8700183437 /* WeatherModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		5B0A91D422CF39720066E0B0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5B0A91DA22CF9DCA0066E0B0 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		5B0ABF7922D12D8D00183437 /* HoursCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoursCollectionViewCell.swift; sourceTree = "<group>"; };
+		5B0ABF7D22D4BB8700183437 /* WeatherModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,7 @@
 				5B0A91D422CF39720066E0B0 /* Info.plist */,
 				5B0A91CC22CF39700066E0B0 /* Weather.xcdatamodeld */,
 				5B0ABF7922D12D8D00183437 /* HoursCollectionViewCell.swift */,
+				5B0ABF7D22D4BB8700183437 /* WeatherModel.swift */,
 			);
 			path = Weather;
 			sourceTree = "<group>";
@@ -148,6 +151,7 @@
 				5B0A91C822CF39700066E0B0 /* ViewController.swift in Sources */,
 				5B0ABF7A22D12D8D00183437 /* HoursCollectionViewCell.swift in Sources */,
 				5B0A91DB22CF9DCA0066E0B0 /* CustomTableViewCell.swift in Sources */,
+				5B0ABF7E22D4BB8800183437 /* WeatherModel.swift in Sources */,
 				5B0A91C622CF39700066E0B0 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
