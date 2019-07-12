@@ -7,11 +7,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var daysTableView: UITableView!
     @IBOutlet weak var hoursCollectionView: UICollectionView!
     @IBOutlet weak var currentCity: UILabel!
+    @IBOutlet weak var tempNow: UILabel!
+    @IBOutlet weak var windSpeedNow: UILabel!
+    @IBOutlet weak var weatherStateNow: UILabel!
     
+
     let arrayOfDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sut", "Sun"]
     
     var locationManager = CLLocationManager()
     var urlString = "https://www.metaweather.com/api/location/"
+    var weatherData: WeatherModel? //создала переменную, чтобы использовать распаршенные данные из любого места в коде. опшинал, тк не знаю как создать пустое значение
     
     
     
@@ -58,7 +63,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         guard let url = URL(string: url) else { return}
         let dataTask = URLSession.shared.dataTask(with: url) {
             (data, responce, error) in guard let dataResponceWoeid = data else { return }
+             DispatchQueue.main.sync {
             self.parseDataWoeid(data: dataResponceWoeid)
+            }
         }
         dataTask.resume()
     }
@@ -95,17 +102,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func parseData(data: Data) {
         do {
             let weatherInfo = try JSONDecoder().decode(WeatherModel.self, from: data)
+            weatherData = weatherInfo //присвоила глобальной переменной (из которой буду брать значения для табл) значение полученных данных
             print("Array with weather data:\(weatherInfo)")
             let todayMax = weatherInfo.consolidatedWeather[0].maxTemp
-            let dateOfADay = weatherInfo.consolidatedWeather[0].applicableDate
-            print("current date: \(dateOfADay)")
             print("max temp: \(todayMax)")
-            
+             DispatchQueue.main.sync {
+            self.updateWeatherToday(data: weatherInfo)
+            }
         } catch let error {
             print("there is an error: \(error)")
         }
     }
     
+    func updateWeatherToday(data: WeatherModel) {
+        tempNow.text = String(data.consolidatedWeather[0].theTemp)
+        windSpeedNow.text = String(data.consolidatedWeather[0].windSpeed)
+        weatherStateNow.text = String(data.consolidatedWeather[0].weatherStateName)
+    }
+
 }
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
@@ -115,7 +129,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell Identifier", for: indexPath) as? CustomTableViewCell else { return UITableViewCell()}
-        cell.setUpCell(string: arrayOfDays[indexPath.row])
+        cell.setUpCell(info: weatherData!)
         return cell
     }
     
