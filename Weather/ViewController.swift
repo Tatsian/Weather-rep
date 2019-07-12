@@ -11,15 +11,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var windSpeedNow: UILabel!
     @IBOutlet weak var weatherStateNow: UILabel!
     
-
-    let arrayOfDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sut", "Sun"]
-    
     var locationManager = CLLocationManager()
     var urlString = "https://www.metaweather.com/api/location/"
     var weatherData: WeatherModel? //создала переменную, чтобы использовать распаршенные данные из любого места в коде. опшинал, тк не знаю как создать пустое значение
-    
-    
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +25,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         if CLLocationManager.locationServicesEnabled() {
             locationManager.delegate = self //как только меняется место положение срабатывает метод делегата и получаем новую точку
             locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-            locationManager.startUpdatingLocation() // слежение за местом положения
+//            locationManager.startUpdatingLocation() // слежение за местом положения
+            locationManager.startMonitoringSignificantLocationChanges()
         }
     }
     
@@ -47,6 +42,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             print(city + ", " + country)
             self.currentCity.text = city
         }
+        
         downloadDataWoeid(url: urlWithWoeid)
     }
     
@@ -63,7 +59,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         guard let url = URL(string: url) else { return}
         let dataTask = URLSession.shared.dataTask(with: url) {
             (data, responce, error) in guard let dataResponceWoeid = data else { return }
-             DispatchQueue.main.sync {
+             DispatchQueue.main.async {
             self.parseDataWoeid(data: dataResponceWoeid)
             }
         }
@@ -74,18 +70,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         do {
             let woeidInfo = try JSONDecoder().decode([FindingWoeid].self, from: data)
             print("Array of data with woeid: \(woeidInfo)")
-            for count in 0..<woeidInfo.count {
-                let city = woeidInfo[count].title
-                if city == currentCity.text {
-                    let   woeidValue = woeidInfo[count].woeid
-                    print("WOEID1: \(woeidValue)")
-                    downloadData(woeid: woeidValue)
-                }
+            if let nearest = woeidInfo.first {
+                downloadData(woeid: nearest.woeid)
             }
         } catch let error {
             print("there is an error: \(error)")
         }
-        
     }
     
     func downloadData(woeid: Int) {
@@ -96,6 +86,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             (data, responce, error) in guard let dataResponce = data else { return }
             self.parseData(data: dataResponce)
         }
+
         dataTask.resume()
     }
     
@@ -106,7 +97,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             print("Array with weather data:\(weatherInfo)")
             let todayMax = weatherInfo.consolidatedWeather[0].maxTemp
             print("max temp: \(todayMax)")
-             DispatchQueue.main.sync {
+             DispatchQueue.main.async {
+                self.daysTableView.reloadData()
             self.updateWeatherToday(data: weatherInfo)
             }
         } catch let error {
@@ -115,8 +107,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func updateWeatherToday(data: WeatherModel) {
-        tempNow.text = String(data.consolidatedWeather[0].theTemp)
-        windSpeedNow.text = String(data.consolidatedWeather[0].windSpeed)
+        tempNow.text = String(Int(data.consolidatedWeather[0].theTemp)) + "º"
+        windSpeedNow.text = String(Int(data.consolidatedWeather[0].windSpeed)) + " km/h"
         weatherStateNow.text = String(data.consolidatedWeather[0].weatherStateName)
     }
 
@@ -124,12 +116,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return arrayOfDays.count
+        guard let weatherData = weatherData else {return 0}
+        return weatherData.consolidatedWeather.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell Identifier", for: indexPath) as? CustomTableViewCell else { return UITableViewCell()}
-        cell.setUpCell(info: weatherData!)
+        guard let weatherData = weatherData else { return cell}
+        let info = weatherData.consolidatedWeather[indexPath.row]
+        cell.setUpCell(info: info)
         return cell
     }
     

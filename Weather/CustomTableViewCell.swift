@@ -16,19 +16,16 @@ class CustomTableViewCell: UITableViewCell {
         nextDate.text = ""
     }
     
-    func setUpCell(info: WeatherModel) {
-        DispatchQueue.main.sync { //тк обновления происх в главном экране
-        for i in 1...5 {
-            nextDate.text = info.consolidatedWeather[i].applicableDate
-            minTempOfNextDate.text = String(info.consolidatedWeather[i].minTemp)
-            maxTempOfNextDate.text = String(info.consolidatedWeather[i].maxTemp)
-            } // данные для таблицы 
-        }
+    func setUpCell(info: WeatherForDay) {
+        nextDate.text = info.applicableDate
+        minTempOfNextDate.text = String(Int(info.minTemp)) + "º"
+        maxTempOfNextDate.text = String(Int(info.maxTemp)) + "º"
     }
-    
+}
+
 //    func setUpCell(string: String) {
 //        nextDate.text = string
 //    }
-}
+//}
 
 
