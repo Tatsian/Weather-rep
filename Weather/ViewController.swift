@@ -9,26 +9,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var currentCity: UILabel!
     
     let arrayOfDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sut", "Sun"]
-
+    
     var locationManager = CLLocationManager()
-    var urlString = "https://www.metaweather.com/api/location/44418/"
-
+    var urlString = "https://www.metaweather.com/api/location/"
+    
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         updateLocation()
-        downloadData()
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let locValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
-        print("locations = \(locValue.latitude) \(locValue.longitude)")
-        
-        guard let location: CLLocation = manager.location else { return }
-        fetchCityAndCountry(from: location) { city, country, error in
-            guard let city = city, let country = country, error == nil else { return }
-            print(city + ", " + country)
-            self.currentCity.text = city
-        }
     }
     
     func updateLocation() {
@@ -40,8 +30,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
-    func findWoeidLocatin() {
-        
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let locValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
+        let lattLong = "\(locValue.latitude),\(locValue.longitude)"
+        let urlWithWoeid = self.urlString + "search/?lattlong=" + lattLong
+        print("url for woeid finding1: \(urlWithWoeid)")
+        print("locations = \(locValue.latitude) \(locValue.longitude)")
+        guard let location: CLLocation = manager.location else { return }
+        self.fetchCityAndCountry(from: location) { city, country, error in
+            guard let city = city, let country = country, error == nil else { return }
+            print(city + ", " + country)
+            self.currentCity.text = city
+        }
+        downloadDataWoeid(url: urlWithWoeid)
     }
     
     func fetchCityAndCountry(from location: CLLocation, completion: @escaping (_ city: String?, _ country:  String?, _ error: Error?) -> ()) {
@@ -52,8 +53,38 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
-    func downloadData() {
-        guard let url = URL(string: urlString) else { return}
+    func downloadDataWoeid(url: String) {
+        print("url for woeid finding2: \(url)")
+        guard let url = URL(string: url) else { return}
+        let dataTask = URLSession.shared.dataTask(with: url) {
+            (data, responce, error) in guard let dataResponceWoeid = data else { return }
+            self.parseDataWoeid(data: dataResponceWoeid)
+        }
+        dataTask.resume()
+    }
+    
+    func parseDataWoeid(data: Data) {
+        do {
+            let woeidInfo = try JSONDecoder().decode([FindingWoeid].self, from: data)
+            print("Array of data with woeid: \(woeidInfo)")
+            for count in 0..<woeidInfo.count {
+                let city = woeidInfo[count].title
+                if city == currentCity.text {
+                    let   woeidValue = woeidInfo[count].woeid
+                    print("WOEID1: \(woeidValue)")
+                    downloadData(woeid: woeidValue)
+                }
+            }
+        } catch let error {
+            print("there is an error: \(error)")
+        }
+        
+    }
+    
+    func downloadData(woeid: Int) {
+        let urlWithWoeid = urlString + String(woeid)
+        print("url with woeid a: \(urlWithWoeid)")
+        guard let url = URL(string: urlWithWoeid) else { return}
         let dataTask = URLSession.shared.dataTask(with: url) {
             (data, responce, error) in guard let dataResponce = data else { return }
             self.parseData(data: dataResponce)
@@ -64,17 +95,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func parseData(data: Data) {
         do {
             let weatherInfo = try JSONDecoder().decode(WeatherModel.self, from: data)
-            print(weatherInfo)
+            print("Array with weather data:\(weatherInfo)")
             let todayMax = weatherInfo.consolidatedWeather[0].maxTemp
             let dateOfADay = weatherInfo.consolidatedWeather[0].applicableDate
-            print(dateOfADay)
-            print(todayMax)
+            print("current date: \(dateOfADay)")
+            print("max temp: \(todayMax)")
             
         } catch let error {
             print("there is an error: \(error)")
         }
-        
-        
     }
     
 }
