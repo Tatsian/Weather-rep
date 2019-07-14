@@ -3,7 +3,7 @@ import UIKit
 class CustomTableViewCell: UITableViewCell {
     
     @IBOutlet weak var nextDate: UILabel!
-    
+    @IBOutlet weak var tableImage: UIImageView!
     @IBOutlet weak var minTempOfNextDate: UILabel!
     @IBOutlet weak var maxTempOfNextDate: UILabel!
     override func awakeFromNib() {
@@ -22,10 +22,5 @@ class CustomTableViewCell: UITableViewCell {
         maxTempOfNextDate.text = String(Int(info.maxTemp)) + "º"
     }
 }
-
-//    func setUpCell(string: String) {
-//        nextDate.text = string
-//    }
-//}
 
 

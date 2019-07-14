@@ -5,12 +5,15 @@ import CoreLocation
 class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var daysTableView: UITableView!
-    @IBOutlet weak var hoursCollectionView: UICollectionView!
     @IBOutlet weak var currentCity: UILabel!
     @IBOutlet weak var tempNow: UILabel!
     @IBOutlet weak var windSpeedNow: UILabel!
+    @IBOutlet weak var windEmoji: UILabel!
     @IBOutlet weak var weatherStateNow: UILabel!
+    @IBOutlet weak var stateImage: UIImageView!
+    @IBOutlet weak var instargamLinkButton: UIButton!
     
+    let imageDictionary = ["c" : "☀️", "h" : "🌧", "hc" : "☁️", "hr" : "🌧", "lc" : "⛅️", "lr" : "💦", "s" : "🌦", "sl" : "💦❄️", "sn" : "🌨", "t" : "⚡️"]
     var locationManager = CLLocationManager()
     var urlString = "https://www.metaweather.com/api/location/"
     var weatherData: WeatherModel? //создала переменную, чтобы использовать распаршенные данные из любого места в коде. опшинал, тк не знаю как создать пустое значение
@@ -18,6 +21,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         updateLocation()
+    }
+    
+    @IBAction func instaButtonTapped(_ sender: UIButton) {
+            openInstagram()
+            print("MINSK")
     }
     
     func updateLocation() {
@@ -36,13 +44,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let urlWithWoeid = self.urlString + "search/?lattlong=" + lattLong
         print("url for woeid finding1: \(urlWithWoeid)")
         print("locations = \(locValue.latitude) \(locValue.longitude)")
-        guard let location: CLLocation = manager.location else { return }
-        self.fetchCityAndCountry(from: location) { city, country, error in
-            guard let city = city, let country = country, error == nil else { return }
-            print(city + ", " + country)
-            self.currentCity.text = city
-        }
-        
         downloadDataWoeid(url: urlWithWoeid)
     }
     
@@ -86,7 +87,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             (data, responce, error) in guard let dataResponce = data else { return }
             self.parseData(data: dataResponce)
         }
-
         dataTask.resume()
     }
     
@@ -97,9 +97,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             print("Array with weather data:\(weatherInfo)")
             let todayMax = weatherInfo.consolidatedWeather[0].maxTemp
             print("max temp: \(todayMax)")
-             DispatchQueue.main.async {
+            DispatchQueue.main.async {
                 self.daysTableView.reloadData()
-            self.updateWeatherToday(data: weatherInfo)
+                self.updateWeatherToday(data: weatherInfo)
+                self.instargamLinkButton.setTitle("#" + weatherInfo.title, for: .normal)
             }
         } catch let error {
             print("there is an error: \(error)")
@@ -107,11 +108,29 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func updateWeatherToday(data: WeatherModel) {
+        currentCity.text = data.title
         tempNow.text = String(Int(data.consolidatedWeather[0].theTemp)) + "º"
         windSpeedNow.text = String(Int(data.consolidatedWeather[0].windSpeed)) + " km/h"
         weatherStateNow.text = String(data.consolidatedWeather[0].weatherStateName)
+        windEmoji.text = imageDictionary[data.consolidatedWeather[0].weatherStateAbbr]
     }
-
+    func showWeatherPictureInTable(weatherState: String) {
+        
+    }
+    
+    func openInstagram() {
+        guard  var instagramHandle = currentCity.text else { return }
+        instagramHandle = instagramHandle.replacingOccurrences(of: " ", with: "_")
+                print("instagramHandle: \(instagramHandle)")
+            guard let url = URL(string: "https://www.instagram.com/explore/tags/\(instagramHandle.lowercased())/")  else { return }
+            if UIApplication.shared.canOpenURL(url) {
+                if #available(iOS 10.0, *) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                } else {
+                    UIApplication.shared.openURL(url)
+                }
+            }
+    }
 }
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
@@ -125,21 +144,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         guard let weatherData = weatherData else { return cell}
         let info = weatherData.consolidatedWeather[indexPath.row]
         cell.setUpCell(info: info)
+        cell.backgroundColor = UIColor.clear
         return cell
     }
-    
 }
 
-extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 24
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = hoursCollectionView.dequeueReusableCell(withReuseIdentifier: "collectionIdentifier", for: indexPath) as? HoursCollectionViewCell else { return UICollectionViewCell()}
-        cell.hoursCell.text = String(indexPath.row)
-        return cell
-    }
-    
-    
-}
