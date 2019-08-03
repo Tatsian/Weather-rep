@@ -25,7 +25,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBAction func instaButtonTapped(_ sender: UIButton) {
             openInstagram()
-            print("MINSK")
     }
     
     func updateLocation() {
@@ -100,7 +99,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             DispatchQueue.main.async {
                 self.daysTableView.reloadData()
                 self.updateWeatherToday(data: weatherInfo)
-                self.instargamLinkButton.setTitle("#" + weatherInfo.title, for: .normal)
+                self.instargamLinkButton.setTitle("#" + weatherInfo.title.lowercased().replacingOccurrences(of: " ", with: "_"), for: .normal)
             }
         } catch let error {
             print("there is an error: \(error)")
@@ -114,10 +113,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         weatherStateNow.text = String(data.consolidatedWeather[0].weatherStateName)
         windEmoji.text = imageDictionary[data.consolidatedWeather[0].weatherStateAbbr]
     }
-    func showWeatherPictureInTable(weatherState: String) {
-        
-    }
-    
+
     func openInstagram() {
         guard  var instagramHandle = currentCity.text else { return }
         instagramHandle = instagramHandle.replacingOccurrences(of: " ", with: "_")
