@@ -13,7 +13,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var stateImage: UIImageView!
     @IBOutlet weak var instargamLinkButton: UIButton!
     
-    let imageDictionary = ["c" : "☀️", "h" : "🌧", "hc" : "☁️", "hr" : "🌧", "lc" : "⛅️", "lr" : "💦", "s" : "🌦", "sl" : "💦❄️", "sn" : "🌨", "t" : "⚡️"]
+  //  let imageDictionary = ["c" : "☀️", "h" : "🌧", "hc" : "☁️", "hr" : "🌧", "lc" : "⛅️", "lr" : "💦", "s" : "🌦", "sl" : "💦❄️", "sn" : "🌨", "t" : "⚡️"]
+    
+    let stateImageDictionary = ["c" : #imageLiteral(resourceName: "c") , "h" : #imageLiteral(resourceName: "h"), "hc" : #imageLiteral(resourceName: "hc"), "hr" : #imageLiteral(resourceName: "hr"), "lc" : #imageLiteral(resourceName: "lc"), "lr" : #imageLiteral(resourceName: "lr"), "s" : #imageLiteral(resourceName: "s"), "sl" : #imageLiteral(resourceName: "sl"), "sn" : #imageLiteral(resourceName: "sn"), "t" : #imageLiteral(resourceName: "t")]
     var locationManager = CLLocationManager()
     var urlString = "https://www.metaweather.com/api/location/"
     var weatherData: WeatherModel? //создала переменную, чтобы использовать распаршенные данные из любого места в коде. опшинал, тк не знаю как создать пустое значение
@@ -111,7 +113,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         tempNow.text = String(Int(data.consolidatedWeather[0].theTemp)) + "º"
         windSpeedNow.text = String(Int(data.consolidatedWeather[0].windSpeed)) + " km/h"
         weatherStateNow.text = String(data.consolidatedWeather[0].weatherStateName)
-        windEmoji.text = imageDictionary[data.consolidatedWeather[0].weatherStateAbbr]
+        windEmoji.text = "💨"
+     stateImage.image = stateImageDictionary[data.consolidatedWeather[0].weatherStateAbbr]
     }
 
     func openInstagram() {
